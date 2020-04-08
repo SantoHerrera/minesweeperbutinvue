@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<head>
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+</head>
+
 <body>
-  <div id="app">
-    <table>
-      <tbody>
-        <tr v-for="(sale,i) in sales" :key="i" v-on:click="clickThatMothafucka(this.key)">
-          <td v-for="(cell, j) in sale" :key='i-j'> {{ cell.Sale }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <!-- built files will be auto injected -->
+  <div id="app"></div>
 </body>
 
 </html>

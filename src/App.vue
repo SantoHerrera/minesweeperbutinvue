@@ -1,4 +1,19 @@
+<template>
+  <div id='app'> 
+    <HelloWorld />
+  </div>
+</template>
 
-//import HelloWorld from "./components/HelloWorld.vue";
+<script>
+import HelloWorld from './components/HelloWorld.vue'
 
+
+export default {
+  name: 'App',
+  idk: 'linked',
+  components: {
+    HelloWorld
+  }
+}
+</script>
 
