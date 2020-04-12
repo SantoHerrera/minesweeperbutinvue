@@ -5,10 +5,10 @@
         <tr v-for="(row,i) in board" :key="i">
           <td
             v-for="(cell, j) in row"
-            :key="`${i}-${j}`"
-            :id="`${i}-${j}`"
+            :key="`${j}-${i}`"
+            :id="`${j}-${i}`"
             v-on:click="rightClick"
-          >{{ cell.screen }} {{cell.hasbomb }}</td>
+          >{{ cell.screen }} {{cell.hasBomb }} {{cell.nearbyBombs}}</td>
         </tr>
       </tbody>
     </table>
@@ -32,21 +32,30 @@ export default {
     },
     createNestedArray: function(x, y) {
       let nestedArray = [];
+
+      let bombsLocation = [];
       for (let i = 0; i < y; i++) {
         nestedArray.push([]);
         for (let j = 0; j < x; j++) {
           //true represents bomb
-          let hasbomb = this.randomTrueFalse();
+          let isBomb = this.randomTrueFalse();
+
+          if (isBomb) {
+            bombsLocation.push(`${j}-${i}`);
+          }
           //information of individual cell
           nestedArray[i][j] = {
             screen: "?",
-            hasbomb: hasbomb,
+            hasBomb: isBomb,
             hasBeenClicked: false,
             nearbyBombs: 0,
             id: `${j}-${i}`,
             wasrightClicked: false
           };
         }
+      }
+      for(let i = 0; i < bombsLocation.length; i++) {
+        this.allNearbyCells(bombsLocation[i], nestedArray, (cell) => {cell.nearbyBombs++})
       }
       return nestedArray;
     },
@@ -62,21 +71,51 @@ export default {
 
       let cellClicked = this.getCell(cell.target.id);
 
-      if (this.firstClick) {
-        //this.fixFirstClickBomb(cell.target.id);
-        this.firstClick = false;
+      //console.log(cellClicked.id)
+      // this.getCell(cellClicked.id, (cell) => {
+      //   cell.screen = 'M'
+      // })
+      let Id = this.stringToId(cellClicked.id);
 
+      console.log(cellClicked.id, Id);
+
+      //this.board[Id[0]][Id[1]].screen = 'W'
+
+      // if (this.firstClick) {
+      //   //this.fixFirstClickBomb(cell.target.id);
+      //   this.firstClick = false;
+
+      this.getCell(cellClicked.id, cell => {
+        cell.screen = "M";
+      });
+
+      this.allNearbyCells(cellClicked.id, cell => {
+        cell.screen = "M";
+      });
+      // }
+
+      /*
         this.allNearbyCells(cellClicked.id, cell => {
           console.log(cell.id);
         });
-      }
+        */
 
       if (cellClicked.hasbomb) {
         alert("youve clicked a bomb, reload page to play again");
       }
     },
-    fixFirstClickBomb: function() {
-      //let bombsRemoved = [];
+    fixFirstClickBomb: function(cellId) {
+      let bombsRemoved = [];
+
+      this.getCell(cellId, cell => {
+        if (cell.hasbomb) {
+          cell.hasBomb = !cell.hasBomb;
+
+          bombsRemoved.push(cell.id);
+        }
+      });
+
+      //console.log(bombsRemoved)
     },
     removeBomb: function(cellId) {
       this.getCell(cellId, cell => {
@@ -88,28 +127,28 @@ export default {
       let Id = this.stringToId(cellID);
 
       if (fn) {
-        fn(this.board[Id[0]][Id[1]]);
+        fn(this.board[Id[1]][Id[0]]);
       }
-      return this.board[Id[0]][Id[1]];
+      return this.board[Id[1]][Id[0]];
     },
-    allNearbyCells: function(cellId, fn) {
+    allNearbyCells: function(cellId, nestedArray,  fn) {
       let Id = this.stringToId(cellId);
 
-      const x = Id[0];
-      const y = Id[1];
+      const y = Id[0];
+      const x = Id[1];
 
       for (let i = x - 1; i <= x + 1; i++) {
         for (let j = y - 1; j <= y + 1; j++) {
           //if it dont exist, move on
-          if (!this.board[i] || !this.board[i][j]) {
+          if (!nestedArray[i] || !nestedArray[i][j]) {
             continue;
           }
-          //dont put the box you clicked on the array of ids that represent the surrounding ids
+          //skip the cell that was passedd in
           if (i === x && j === y) {
             continue;
           }
 
-          fn(this.board[i][j]);
+          fn(nestedArray[i][j]);
         }
       }
     }
