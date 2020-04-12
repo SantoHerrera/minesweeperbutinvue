@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     randomTrueFalse: function() {
-      return Math.random() <= 0.2;
+      return Math.random() <= 0.4;
     },
     createNestedArray: function(x, y) {
       let nestedArray = [];
@@ -54,8 +54,10 @@ export default {
           };
         }
       }
-      for(let i = 0; i < bombsLocation.length; i++) {
-        this.allNearbyCells(bombsLocation[i], nestedArray, (cell) => {cell.nearbyBombs++})
+      for (let i = 0; i < bombsLocation.length; i++) {
+        this.allNearbyCells(bombsLocation[i], nestedArray, cell => {
+          cell.nearbyBombs++;
+        });
       }
       return nestedArray;
     },
@@ -67,71 +69,56 @@ export default {
       return ID;
     },
     rightClick: function(cell) {
-      //let Id = this.stringToId(cell.target.id);
-
       let cellClicked = this.getCell(cell.target.id);
 
-      //console.log(cellClicked.id)
-      // this.getCell(cellClicked.id, (cell) => {
-      //   cell.screen = 'M'
-      // })
-      let Id = this.stringToId(cellClicked.id);
+      if (this.firstClick) {
+        this.firstClick = false;
 
-      console.log(cellClicked.id, Id);
-
-      //this.board[Id[0]][Id[1]].screen = 'W'
-
-      // if (this.firstClick) {
-      //   //this.fixFirstClickBomb(cell.target.id);
-      //   this.firstClick = false;
-
-      this.getCell(cellClicked.id, cell => {
-        cell.screen = "M";
-      });
-
-      this.allNearbyCells(cellClicked.id, cell => {
-        cell.screen = "M";
-      });
-      // }
-
-      /*
-        this.allNearbyCells(cellClicked.id, cell => {
-          console.log(cell.id);
-        });
-        */
+        this.clear3by3OfBombs(cellClicked.id);
+      }
 
       if (cellClicked.hasbomb) {
         alert("youve clicked a bomb, reload page to play again");
       }
     },
-    fixFirstClickBomb: function(cellId) {
+    clear3by3OfBombs: function(cellId) {
       let bombsRemoved = [];
-
+      //middle Cell, cell clicked id
       this.getCell(cellId, cell => {
         if (cell.hasbomb) {
-          cell.hasBomb = !cell.hasBomb;
+          this.removeBomb(cell.id);
 
           bombsRemoved.push(cell.id);
         }
       });
 
-      //console.log(bombsRemoved)
+      this.allNearbyCells(cellId, this.board, cell => {
+        if (cell.hasBomb) {
+          this.removeBomb(cell.id);
+
+          bombsRemoved.push(cell.id);
+        }
+      });
     },
     removeBomb: function(cellId) {
       this.getCell(cellId, cell => {
         cell.hasBomb = false;
       });
+
+      this.allNearbyCells(cellId, this.board, cell => {
+        cell.nearbyBombs--;
+      });
     },
     getCell: function(cellID, fn) {
       //modify one cell
       let Id = this.stringToId(cellID);
-
+      //this shit kinda ugly
       if (fn) {
         fn(this.board[Id[1]][Id[0]]);
       }
       return this.board[Id[1]][Id[0]];
     },
-    allNearbyCells: function(cellId, nestedArray,  fn) {
+    allNearbyCells: function(cellId, nestedArray, fn) {
       let Id = this.stringToId(cellId);
 
       const y = Id[0];
