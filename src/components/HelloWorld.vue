@@ -55,9 +55,14 @@ export default {
         }
       }
       for (let i = 0; i < bombsLocation.length; i++) {
-        this.allNearbyCells(bombsLocation[i], nestedArray, cell => {
-          cell.nearbyBombs++;
-        });
+        this.allNearbyCells(
+          bombsLocation[i],
+          nestedArray,
+          cell => {
+            cell.nearbyBombs++;
+          },
+          true
+        );
       }
       return nestedArray;
     },
@@ -73,7 +78,6 @@ export default {
 
       if (this.firstClick) {
         this.firstClick = false;
-
         this.clear3by3OfBombs(cellClicked.id);
       }
 
@@ -83,30 +87,22 @@ export default {
     },
     clear3by3OfBombs: function(cellId) {
       let bombsRemoved = [];
-      //middle Cell, cell clicked id
-      this.getCell(cellId, cell => {
-        if (cell.hasbomb) {
-          this.removeBomb(cell.id);
-
-          bombsRemoved.push(cell.id);
-        }
-      });
 
       this.allNearbyCells(cellId, this.board, cell => {
         if (cell.hasBomb) {
-          this.removeBomb(cell.id);
+          cell.hasBomb = false;
 
           bombsRemoved.push(cell.id);
-        }
-      });
-    },
-    removeBomb: function(cellId) {
-      this.getCell(cellId, cell => {
-        cell.hasBomb = false;
-      });
 
-      this.allNearbyCells(cellId, this.board, cell => {
-        cell.nearbyBombs--;
+          this.allNearbyCells(
+            cell.id,
+            this.board,
+            cell => {
+              cell.nearbyBombs--;
+            },
+            true
+          );
+        }
       });
     },
     getCell: function(cellID, fn) {
@@ -118,7 +114,8 @@ export default {
       }
       return this.board[Id[1]][Id[0]];
     },
-    allNearbyCells: function(cellId, nestedArray, fn) {
+    allNearbyCells: function(cellId, nestedArray, fn, skipMiddle) {
+      //skipMiddle defaults to false, true applys function passed in to cellId
       let Id = this.stringToId(cellId);
 
       const y = Id[0];
@@ -132,7 +129,9 @@ export default {
           }
           //skip the cell that was passedd in
           if (i === x && j === y) {
-            continue;
+            if (skipMiddle) {
+              continue;
+            }
           }
 
           fn(nestedArray[i][j]);
