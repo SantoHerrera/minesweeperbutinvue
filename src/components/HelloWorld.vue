@@ -27,7 +27,7 @@ export default {
       if I set it here and try to increment it when f incrementBomb
       gets called it wont. so this is a little work around
       */
-      //bombsOnBoard: 0, this gets set during createNestedArray, 
+      //bombsOnBoard: 0, this gets set during createNestedArray,
       shitLinked: "Please appear",
       board: this.createNestedArray(9, 6),
       firstClick: true,
@@ -63,14 +63,13 @@ export default {
         }
       }
       this.bombIncrement(bombsLocation, nestedArray);
-      this.bombsOnBoard = bombsLocation.length;
 
       return nestedArray;
     },
     bombIncrement: function(arr, nestedArray) {
+      this.bombsOnBoard = arr.length;
       //given arrayy of the ids of bombs, it will increement allnearbycell, skipping middle
       for (let i = 0; i < arr.length; i++) {
-        
         this.allNearbyCells(
           arr[i],
           nestedArray,
