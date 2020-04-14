@@ -1,5 +1,7 @@
 <template>
   <div class="hello">
+    <p>Bombs On Board {{bombsOnBoard}}, GoodLuck!</p>
+    <p>Bombs marked successfully {{bombsDiscovered}}</p>
     <table>
       <tbody>
         <tr v-for="(row,i) in board" :key="i">
@@ -21,9 +23,15 @@ export default {
   name: "HelloWorld",
   data: function() {
     return {
+      /* 
+      if I set it here and try to increment it when f incrementBomb
+      gets called it wont. so this is a little work around
+      */
+      //bombsOnBoard: 0, this gets set during createNestedArray, 
       shitLinked: "Please appear",
       board: this.createNestedArray(9, 6),
-      firstClick: true
+      firstClick: true,
+      bombsDiscovered: 0
     };
   },
   methods: {
@@ -54,9 +62,17 @@ export default {
           };
         }
       }
-      for (let i = 0; i < bombsLocation.length; i++) {
+      this.bombIncrement(bombsLocation, nestedArray);
+      this.bombsOnBoard = bombsLocation.length;
+
+      return nestedArray;
+    },
+    bombIncrement: function(arr, nestedArray) {
+      //given arrayy of the ids of bombs, it will increement allnearbycell, skipping middle
+      for (let i = 0; i < arr.length; i++) {
+        
         this.allNearbyCells(
-          bombsLocation[i],
+          arr[i],
           nestedArray,
           cell => {
             cell.nearbyBombs++;
@@ -64,7 +80,6 @@ export default {
           true
         );
       }
-      return nestedArray;
     },
     stringToId: function(string) {
       //given 'x-y' will return ['x', 'y']
@@ -91,6 +106,8 @@ export default {
       this.allNearbyCells(cellId, this.board, cell => {
         if (cell.hasBomb) {
           cell.hasBomb = false;
+
+          this.bombsOnBoard--;
 
           bombsRemoved.push(cell.id);
 

@@ -1,19 +1,24 @@
 <template>
-  <div id='app'> 
+  <div id="app">
     <HelloWorld />
+    {{idk}}
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import HelloWorld from "./components/HelloWorld.vue";
 
 export default {
-  name: 'App',
-  idk: 'linked',
+  name: "App",
+  idk: "linked",
+  data: function() {
+    return {
+      idk: "fuck"
+    };
+  },
   components: {
     HelloWorld
   }
-}
+};
 </script>
 
