@@ -41,6 +41,59 @@ export default {
     randomTrueFalse: function() {
       return Math.random() <= 0.2;
     },
+    ////////helper functions
+    allNearbyCells: function(cellId, nestedArray, fn, skipMiddle) {
+      //skipMiddle defaults to false, true applys function passed in to cellId
+      let Id = this.stringToId(cellId);
+
+      const y = Id[0];
+      const x = Id[1];
+
+      for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
+          //if it dont exist, move on
+          if (!nestedArray[i] || !nestedArray[i][j]) {
+            continue;
+          }
+          //skip the cell that was passedd in
+          if (i === x && j === y) {
+            if (skipMiddle) {
+              continue;
+            }
+          }
+
+          fn(nestedArray[i][j]);
+        }
+      }
+    },
+    changeCellScreen: function(id) {
+      let cellClicked = this.getCell(id);
+
+      if (cellClicked.hasBomb) {
+        cellClicked.screen = "*";
+      } else if (!cellClicked.hasBomb && cellClicked.nearbyBombs === 0) {
+        cellClicked.screen = " ";
+      } else {
+        cellClicked.screen = `${cellClicked.nearbyBombs}`;
+      }
+    },
+    getCell: function(cellID, fn) {
+      //modify one cell
+      let Id = this.stringToId(cellID);
+      //this shit kinda ugly
+      if (fn) {
+        fn(this.board[Id[1]][Id[0]]);
+      }
+      return this.board[Id[1]][Id[0]];
+    },
+    stringToId: function(string) {
+      //given 'x-y' will return ['x', 'y']
+      let theId = string.split("-");
+      //x && y will be turned into numbers, returns array
+      let ID = theId.map(stringNumber => parseInt(stringNumber));
+      return ID;
+    },
+    //function dealing with board creation
     createNestedArray: function(x, y) {
       let nestedArray = [];
 
@@ -84,13 +137,7 @@ export default {
         );
       }
     },
-    stringToId: function(string) {
-      //given 'x-y' will return ['x', 'y']
-      let theId = string.split("-");
-      //x && y will be turned into numbers, returns array
-      let ID = theId.map(stringNumber => parseInt(stringNumber));
-      return ID;
-    },
+    //function when you click board
     clear3by3OfBombs: function(cellId) {
       this.allNearbyCells(cellId, this.board, cell => {
         if (cell.hasBomb) {
@@ -110,17 +157,6 @@ export default {
         }
       });
     },
-    changeCellScreen: function(id) {
-      let cellClicked = this.getCell(id);
-
-      if (cellClicked.hasBomb) {
-        cellClicked.screen = "*";
-      } else if (!cellClicked.hasBomb && cellClicked.nearbyBombs === 0) {
-        cellClicked.screen = " ";
-      } else {
-        cellClicked.screen = `${cellClicked.nearbyBombs}`;
-      }
-    },
     cellClick: function(cell) {
       let cellClicked = this.getCell(cell.target.id);
 
@@ -132,9 +168,9 @@ export default {
           this.changeCellScreen(cell.id);
         });
       }
-      //when you decide to click on a cell that was marked
-      if(cellClicked.isMarked) {
-        this.markCell(cellClicked.id)
+      //when you decide to click on a cell that was marked, forces you to unmark cell before being able to click it
+      if (cellClicked.isMarked) {
+        return;
       }
 
       if (cellClicked.hasBomb) {
@@ -156,13 +192,15 @@ export default {
 
       cellClicked.isMarked = !cellClicked.isMarked;
 
-      if (cellClicked.isMarked) { //mark cell
+      if (cellClicked.isMarked) {
+        //mark cell
         cellClicked.screen = "M";
         this.bombsOnBoard--;
         if (cellClicked.hasBomb) {
           this.bombsDiscoveredVerified--;
         }
-      } else { //unmark cell
+      } else {
+        //unmark cell
         cellClicked.screen = "?";
         this.bombsOnBoard++;
         if (cellClicked.hasBomb) {
@@ -175,39 +213,6 @@ export default {
       if (this.bombsDiscoveredVerified === 0) {
         alert('you"ve won hoe');
       }
-    },
-    getCell: function(cellID, fn) {
-      //modify one cell
-      let Id = this.stringToId(cellID);
-      //this shit kinda ugly
-      if (fn) {
-        fn(this.board[Id[1]][Id[0]]);
-      }
-      return this.board[Id[1]][Id[0]];
-    },
-    allNearbyCells: function(cellId, nestedArray, fn, skipMiddle) {
-      //skipMiddle defaults to false, true applys function passed in to cellId
-      let Id = this.stringToId(cellId);
-
-      const y = Id[0];
-      const x = Id[1];
-
-      for (let i = x - 1; i <= x + 1; i++) {
-        for (let j = y - 1; j <= y + 1; j++) {
-          //if it dont exist, move on
-          if (!nestedArray[i] || !nestedArray[i][j]) {
-            continue;
-          }
-          //skip the cell that was passedd in
-          if (i === x && j === y) {
-            if (skipMiddle) {
-              continue;
-            }
-          }
-
-          fn(nestedArray[i][j]);
-        }
-      }
     }
   }
 };
@@ -215,7 +220,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-td, th {
+td,
+th {
   border: 1px solid black;
 }
 </style>>
