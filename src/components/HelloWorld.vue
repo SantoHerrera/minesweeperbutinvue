@@ -41,7 +41,6 @@ export default {
     randomTrueFalse: function() {
       return Math.random() <= 0.2;
     },
-    ////////helper functions
     allNearbyCells: function(cellId, nestedArray, fn, skipMiddle) {
       //skipMiddle defaults to false, true applys function passed in to cellId
       let Id = this.stringToId(cellId);
