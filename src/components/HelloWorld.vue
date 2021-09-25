@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <p>Bombs On Board {{bombsOnBoard}}, GoodLuck!</p>
+    <p>Bombs On Board {{bombsOnBoard}}</p>
     <!-- uncomment this for a cheat sheet
     <p>Bombs isMarked successfully {{bombsDiscoveredVerified}}</p>
     -->
@@ -32,7 +32,7 @@ export default {
       if I set it here and try to increment it when f incrementBomb
       gets called it wont. so this is a little work around
       */
-      shitLinked: "Please appear",
+      shitLinked: "Goodluck!!",
       board: this.createNestedArray(9, 6),
       firstClick: true
     };

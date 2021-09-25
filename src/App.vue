@@ -1,14 +1,13 @@
 <template>
   <div id="app">
-    <StopWatch />
-    <HelloWorld />
+    <HelloWorld/>
     {{idk}}
   </div>
 </template>
 
 <script>
 import HelloWorld from "./components/HelloWorld.vue";
-import StopWatch from "./components/StopWatch.vue";
+//import StopWatch from "./components/StopWatch.vue";
 
 
 export default {
@@ -16,12 +15,12 @@ export default {
   idk: "linked",
   data: function() {
     return {
-      idk: "fuck"
+      idk: ""
     };
   },
   components: {
-    HelloWorld,
-    StopWatch
+    HelloWorld
+    //StopWatch
   }
 };
 </script>
